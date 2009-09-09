@@ -71,7 +71,12 @@ if ($_POST['status'] == 'add') {
 	$tweet = trim($comment. ' #bookmark '. $title . ' ' . $url);
 	$hcObj =& new HTTP_Client(null, array('Authorization'=>'Basic '.base64_encode(TWITTER_USER.':'.TWITTER_PASS)));
 	$ret = $hcObj->post('http://twitter.com/statuses/update.xml', array('status' => $tweet));
+        $try = 1;
 	error_log("twitter post $tweet");
+        while ($ret == 408 && $try < 10) {
+	    $ret = $hcObj->post('http://twitter.com/statuses/update.xml', array('status' => $tweet));
+            $try++;
+        }
 	if ($ret != 200) {
 		error_log("got invalid http status $ret");
 	}
